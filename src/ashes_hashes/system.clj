@@ -8,7 +8,7 @@
             [ring.component.jetty :refer [jetty-server]]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [ring.middleware.webjars :refer [wrap-webjars]]
-            [ashes-hashes.endpoint.example :refer [example-endpoint]]))
+            [ashes-hashes.endpoint.game :refer [game-endpoint]]))
 
 (def base-config
   {:app {:middleware [[wrap-not-found :not-found]
@@ -22,8 +22,8 @@
     (-> (component/system-map
          :app  (handler-component (:app config))
          :http (jetty-server (:http config))
-         :example (endpoint-component example-endpoint))
+         :game (endpoint-component game-endpoint))
         (component/system-using
          {:http [:app]
-          :app  [:example]
-          :example []}))))
+          :app  [:game]
+          :game []}))))

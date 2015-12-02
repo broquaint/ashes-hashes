@@ -42,6 +42,17 @@ user=> (reset)
 :resumed
 ```
 
+If you want to access a ClojureScript REPL, make sure that the site is loaded
+in a browser and run:
+
+```clojure
+user=> (cljs-repl)
+Waiting for browser connection... Connected.
+To quit, type: :cljs/quit
+nil
+cljs.user=>
+```
+
 ### Testing
 
 Testing is fastest through the REPL, as you avoid environment startup

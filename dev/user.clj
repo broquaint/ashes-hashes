@@ -40,6 +40,9 @@
 (defn test []
   (eftest/run-tests (eftest/find-tests "test") {:multithread? false}))
 
+(defn cljs-repl []
+  (figwheel/cljs-repl (:figwheel system)))
+
 (when (io/resource "local.clj")
   (load "local"))
 

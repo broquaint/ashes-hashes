@@ -6,4 +6,5 @@
 
 (def environ
   {:http {:port (some-> env :port Integer.)}
-   :db   {:uri  (env :database-url)}})
+   :db   {:uri  (env :database-url)}
+   :es   {:uri  (env :elasticsearch-url)}})

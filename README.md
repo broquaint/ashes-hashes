@@ -1,8 +1,14 @@
 # ashes-hashes
 
-FIXME: description
+A WIP [DCSS](http://crawl.develz.org/) game query site
+
+This is intended to replace
+[Soup Stash](http://soupstash.broquaint.com/) and provide an
+Elasticsearch driven query interface.
 
 ## Developing
+
+This is a [duct](https://github.com/weavejester/duct) based project.
 
 ### Setup
 
@@ -69,19 +75,10 @@ But you can also run tests through Leiningen.
 lein test
 ```
 
-### Generators
-
-This project has several [generators][] to help you create files.
-
-* `lein gen endpoint <name>` to create a new endpoint
-* `lein gen component <name>` to create a new component
-
-[generators]: https://github.com/weavejester/lein-generate
-
 ## Deploying
 
-FIXME: steps to deploy
+TODO
 
 ## Legal
 
-Copyright © 2015 FIXME
+Copyright © 2015 Dan Brook

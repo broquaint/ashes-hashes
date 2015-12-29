@@ -9,6 +9,7 @@
                  [duct "0.5.5"]
                  [environ "1.0.1"]
                  [meta-merge "0.1.1"]
+                 [medley "0.6.0"]
                  [ring "1.4.0"]
                  [ring/ring-defaults "0.1.5"]
                  [ring-jetty-component "0.3.0"]
@@ -17,6 +18,8 @@
                  [org.webjars/normalize.css "3.0.2"]
                  [duct/hikaricp-component "0.1.0"]
                  [org.postgresql/postgresql "9.4-1203-jdbc4"]
+                 [org.clojure/java.jdbc "0.4.2"]
+                 [yesql "0.5.1"]
                  [clojurewerkz/elastisch "2.1.0"]]
   :plugins [[lein-environ "1.0.1"]
             [lein-gen "0.2.2"]
@@ -50,7 +53,8 @@
                                   [kerodon "0.7.0"]
                                   [com.cemerick/piggieback "0.2.1"]
                                   [duct/figwheel-component "0.3.1"]
-                                  [figwheel "0.5.0-1"]]
+                                  [figwheel "0.5.0-1"]
+                                  [cider/cider-nrepl "0.10.0"]]
                    :source-paths ["dev"]
                    :repl-options {:init-ns user
                                   :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}

@@ -11,7 +11,8 @@
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [ring.middleware.webjars :refer [wrap-webjars]]
             [ashes-hashes.endpoint.game :refer [game-endpoint]]
-            [ashes-hashes.component.elastich :refer [elastich-component]]))
+            [ashes-hashes.component.elastich :refer [elastich-component]]
+            [ashes-hashes.logsumer :refer [logsumer-component]]))
 
 (def base-config
   {:app {:middleware [[wrap-not-found :not-found]
@@ -30,9 +31,11 @@
          :http (jetty-server (:http config))
          :game (endpoint-component game-endpoint)
          :db   (hikaricp (:db config))
-         :es   (elastich-component (:es config)))
+         :es   (elastich-component (:es config))
+         :ls   (logsumer-component {}))
         (component/system-using
          {:http [:app]
           :app  [:game]
           :db   []
+          :ls   [:db :es]
           :game [:es]}))))

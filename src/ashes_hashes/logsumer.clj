@@ -113,7 +113,41 @@
     {})))
 
 (defn games-after-from-db [offset db]
-  (map row->game (games-since-offset {:offset offset} {:connection db})))
+  (map row->game
+       (take 3 (games-since-offset {:offset offset} {:connection db}))))
 
 (defn add-game-to-es [game conn]
   (esd/put conn index-name mapping-type (:id game) game))
+
+(defn really-follow-logrecords [component offset]
+  (let [db (:spec (:db component))
+        es (:conn (:es component))
+        me (:ls component)
+        games (games-after-from-db offset db)]
+    (doseq [game games]
+      (println "Adding " (:id game))
+      (add-game-to-es game es))
+    (println "Added " (count games) " games to ES")
+    (Thread/sleep 1000)
+    (when (deref (:should-keep-running me))
+     (recur component (:file_offset (last games))))))
+
+(defn follow-logrecords [component]
+  (future (really-follow-logrecords component 0))) ;; XXX Don't always start from the start!
+
+(defrecord Logsumer []
+  component/Lifecycle
+  (start [component]
+    (if (:logsumer component)
+      component
+      (let [conn (:conn (:es component))
+            logsumer {:should-keep-running (atom true)}]
+        (when-not (esi/exists? conn index-name)
+          (esi/create conn index-name))
+        (assoc component :logsumer logsumer))))
+  (stop [component]
+    (future (reset! (:should-keep-running (:logsumer component)) false))
+    (dissoc component :logsumer)))
+
+(defn logsumer-component [options]
+  (map->Logsumer options))

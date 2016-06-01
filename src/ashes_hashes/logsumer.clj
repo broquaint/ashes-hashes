@@ -99,7 +99,11 @@
 ;; Turn a row out of Postgres into Clojure data, mostly just turn
 ;; CITEXT -> string.
 (defn- pgrow->clj [row]
-  (map-vals (fn [v] (if (isa? (class v) org.postgresql.util.PGobject) (.getValue v) v)) row))
+  (map-vals (fn [v]
+              (if (isa? (class v) org.postgresql.util.PGobject)
+                (.getValue v)
+                v))
+            row))
 
 ;; Take a row out of the DB and turn it into something that could be
 ;; used by ES.
@@ -133,7 +137,8 @@
      (recur component (:file_offset (last games))))))
 
 (defn follow-logrecords [component]
-  (future (really-follow-logrecords component 0))) ;; XXX Don't always start from the start!
+  (future (really-follow-logrecords component 0)) ;; XXX Don't always start from the start!
+  component)
 
 (defrecord Logsumer []
   component/Lifecycle
@@ -144,7 +149,7 @@
             logsumer {:should-keep-running (atom true)}]
         (when-not (esi/exists? conn index-name)
           (esi/create conn index-name))
-        (assoc component :logsumer logsumer))))
+        (follow-logrecords (assoc component :logsumer logsumer)))))
   (stop [component]
     (future (reset! (:should-keep-running (:logsumer component)) false))
     (dissoc component :logsumer)))

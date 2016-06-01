@@ -5,9 +5,12 @@
 (defrecord ElasticSearchComponent [uri]
   component/Lifecycle
   (start [component]
-    (if (:conn component)
-      component
-      (assoc component :conn (esr/connect (:uri component)))))
+    (let [uri (:uri component)]
+      (if (nil? uri)
+        (throw (IllegalArgumentException. "Didn't get a URI for Elasticsearch!")))
+      (if (:conn component)
+        component
+        (assoc component :conn (esr/connect (:uri component))))))
   (stop [component]
     (dissoc component :conn)))
 

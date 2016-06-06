@@ -12,14 +12,16 @@
 (def the-template "ashes_hashes/endpoint/game.html")
 
 (html/defsnippet facet-refinement the-template [:.facet :li]
-  [refinement]
-  [:a]    (html/content (str (:key  refinement)))
+  [facet refinement]
+  [:a]    (html/do->
+           (html/content (str (:key refinement)))
+           (html/set-attr :href (str "/?" facet "=" (:key refinement))))
   [:span] (html/content (str (:doc_count refinement))))
 
 (html/defsnippet facet-item the-template [:.facet]
-  [[name facet]]
-  [:h4] (html/content (str name))
-  [:li] (html/content (map facet-refinement (:buckets facet))))
+  [[facet refinements]]
+  [:h4] (html/content (clojure.string/capitalize (name facet)))
+  [:ul] (html/content (map (partial facet-refinement (name facet)) (:buckets refinements))))
 
 (html/defsnippet game-entry the-template  [:.game]
   [game]
@@ -28,14 +30,14 @@
 ; Structure of the aggregations
 (comment
   {:races
-   {:doc_count_error_upper_bound 0,
-    :sum_other_doc_count 0,
+   {:doc_count_error_upper_bound 0
+    :sum_other_doc_count 0
     :buckets
     [{:key "elf", :doc_count 1}]}})
 
 (html/deftemplate games the-template
   [results]
-  [:.game] (let [hits (esrsp/hits-from results)
+  [:#games] (let [hits (esrsp/hits-from results)
                  games (map :_source hits)]
              (html/content (map game-entry games)))
   [:.facet] (let [facets (esrsp/aggregations-from results)]
@@ -45,8 +47,9 @@
   (let [results (esd/search (:conn (:es config)) "scratch" "game"
                             :query (q/match-all)
                             :aggs {:titles {:terms {:field :title}}
-                                   :races  {:terms {:field :race}}})]
-    (games results)))
+                                   :races  {:terms {:field :race}}})
+        html-page (games results) ]
+    #dbg html-page))
 
 (defn game-endpoint [config]
   (routes

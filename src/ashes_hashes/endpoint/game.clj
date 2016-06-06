@@ -1,6 +1,5 @@
 (ns ashes-hashes.endpoint.game
   (:require [compojure.core :refer :all]
-            [hiccup.core :as h]
             [net.cgrand.enlive-html :as html]
             [clojurewerkz.elastisch.rest.document :as esd]
             [clojurewerkz.elastisch.rest.response :as esrsp]
@@ -43,14 +42,21 @@
   [:.facet] (let [facets (esrsp/aggregations-from results)]
             (html/content (map facet-item facets))))
 
-(defn show-game [config]
+(defn generate-query [params]
+  (let [refinements (map #(q/terms % (get params %))
+                         (filter (partial contains? params) [:race :title]))]
+   (if (empty? refinements)
+     (q/match-all)
+     (first refinements))))
+
+(defn show-game [config params]
   (let [results (esd/search (:conn (:es config)) "scratch" "game"
-                            :query (q/match-all)
-                            :aggs {:titles {:terms {:field :title}}
-                                   :races  {:terms {:field :race}}})
-        html-page (games results) ]
-    #dbg html-page))
+                            :query (generate-query params)
+                            :aggs {:title {:terms {:field :title}}
+                                   :race  {:terms {:field :race}}})
+        html-page (games results)]
+    html-page))
 
 (defn game-endpoint [config]
   (routes
-   (GET "/" [] (show-game config))))
+   (GET "/" {params :params} (show-game config params))))

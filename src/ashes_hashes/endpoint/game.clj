@@ -17,17 +17,22 @@
 
 (def the-template "ashes_hashes/endpoint/game.html")
 
-(html/defsnippet facet-refinement the-template [:.facet :li]
+(defn facet-value-default [facet refinement]
+  (cond
+    (and (= "god" facet) (empty? refinement)) "No God"
+    :else (str refinement)))
+
+(html/defsnippet facet-refinement the-template [:dl :> #{:dt :dd}]
   [facet refinement]
   [:a]    (html/do->
-           (html/content (str (:key refinement)))
+           (html/content (facet-value-default facet (:key refinement)))
            (html/set-attr :href (str "/?" facet "=" (:key refinement))))
   [:span] (html/content (str (:doc_count refinement))))
 
 (html/defsnippet facet-item the-template [:.facet]
   [[facet refinements]]
   [:h4] (html/content (clojure.string/capitalize (get facets facet)))
-  [:ul] (html/content (map (partial facet-refinement (name facet)) (:buckets refinements))))
+  [:dl] (html/content (map (partial facet-refinement (name facet)) (:buckets refinements))))
 
 (html/defsnippet game-entry the-template  [:.game]
   [game]

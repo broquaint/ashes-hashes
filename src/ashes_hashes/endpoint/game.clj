@@ -5,6 +5,13 @@
             [clojurewerkz.elastisch.rest.response :as esrsp]
             [clojurewerkz.elastisch.query :as q]))
 
+(def facets
+  {:race "Species"
+   :class "Background"
+   :god "God"
+   :terse_msg "Final Message"
+   :version "Game Version"})
+
 (defn game-to-str [doc]
   (str (:player_name doc) " the " (:charabbrev doc) " got " (:score doc)))
 
@@ -19,7 +26,7 @@
 
 (html/defsnippet facet-item the-template [:.facet]
   [[facet refinements]]
-  [:h4] (html/content (clojure.string/capitalize (name facet)))
+  [:h4] (html/content (clojure.string/capitalize (get facets facet)))
   [:ul] (html/content (map (partial facet-refinement (name facet)) (:buckets refinements))))
 
 (html/defsnippet game-entry the-template  [:.game]
@@ -28,7 +35,7 @@
 
 ; Structure of the aggregations
 (comment
-  {:races
+  {:race
    {:doc_count_error_upper_bound 0
     :sum_other_doc_count 0
     :buckets
@@ -44,7 +51,7 @@
 
 (defn generate-query [params]
   (let [refinements (map #(q/terms % (get params %))
-                         (filter (partial contains? params) [:race :title]))]
+                         (filter (partial contains? params) (keys facets)))]
    (if (empty? refinements)
      (q/match-all)
      (first refinements))))
@@ -52,8 +59,7 @@
 (defn show-game [config params]
   (let [results (esd/search (:conn (:es config)) "scratch" "game"
                             :query (generate-query params)
-                            :aggs {:title {:terms {:field :title}}
-                                   :race  {:terms {:field :race}}})
+                            :aggs (into {} (map #(hash-map % {:terms {:field %}}) (keys facets))))
         html-page (games results)]
     html-page))
 

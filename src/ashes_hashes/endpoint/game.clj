@@ -3,7 +3,8 @@
             [net.cgrand.enlive-html :as html]
             [clojurewerkz.elastisch.rest.document :as esd]
             [clojurewerkz.elastisch.rest.response :as esrsp]
-            [clojurewerkz.elastisch.query :as q]))
+            [clojurewerkz.elastisch.query :as q]
+            [ashes-hashes.logsumer :as lg]))
 
 (def facets
   {:race "Species"
@@ -62,7 +63,7 @@
      (first refinements))))
 
 (defn show-game [config params]
-  (let [results (esd/search (:conn (:es config)) "scratch" "game"
+  (let [results (esd/search (:conn (:es config)) lg/index-name lg/type-name
                             :query (generate-query params)
                             :aggs (into {} (map #(hash-map % {:terms {:field %}}) (keys facets))))
         html-page (games results)]

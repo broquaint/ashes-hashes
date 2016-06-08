@@ -2,9 +2,9 @@
   (:require [yesql.core :refer [defqueries]]
             [medley.core :refer [map-vals map-keys]]
             [com.stuartsierra.component :as component]
-            [clojurewerkz.elastisch.rest :as esr]
-            [clojurewerkz.elastisch.rest.index :as esi]
-            [clojurewerkz.elastisch.rest.document :as esd]))
+            [clojurewerkz.elastisch.rest.index :as es-index]
+            [clojurewerkz.elastisch.rest.bulk :as es-bulk]
+            [clojurewerkz.elastisch.rest.document :as es-doc]))
 
 (defqueries "ashes_hashes/logsumer/logrecord.sql")
 
@@ -181,8 +181,8 @@
 
 
 (defn ensure-es-state [conn]
-  (when-not (esi/exists? conn index-name)
-   (esi/create conn index-name :mappings mappings)))
+  (when-not (es-index/exists? conn index-name)
+   (es-index/create conn index-name :mappings mappings)))
 
 (defn- pgrow->clj [row]
   (map-vals (fn [v]
@@ -210,8 +210,9 @@
         query-options {:connection db}]
    (map row->game (games-since-offset binds query-options))))
 
-(defn add-game-to-es [game conn]
-  (esd/put conn index-name mapping-type (:id game) game))
+(defn add-games-to-es [conn games]
+  (let [bulk-doc (es-bulk/bulk-index games)]
+    (es-bulk/bulk-with-index-and-type conn index-name mapping-type bulk-doc)))
 
 (defn catch-up-on-games [offset es db]
   (loop [game-batch (games-after-from-db offset db)
@@ -222,8 +223,7 @@
           ;; But if games were found then process them.
           :else
           (let [last-row-id (:db_row_id (last game-batch))]
-            (doseq [game game-batch]
-              (add-game-to-es game es)) ;; TODO Bulk update!
+            (add-games-to-es es game-batch)
             (println (str "Added " (count game-batch) " games [" last-row-id "] ..."))
             (recur (games-after-from-db last-row-id db) last-row-id)))))
 

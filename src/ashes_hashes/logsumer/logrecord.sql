@@ -70,4 +70,7 @@ LEFT JOIN l_mapdesc ON logrecord.mapdesc_id = l_mapdesc.id
 LEFT JOIN l_banisher ON logrecord.banisher_id = l_banisher.id
 LEFT JOIN l_maxskills ON logrecord.maxskills_id = l_maxskills.id
 LEFT JOIN l_status ON logrecord.status_id = l_status.id
-WHERE logrecord.file_offset > :offset
+-- Not optimal but it'll do.
+ORDER BY logrecord.id
+LIMIT :batchlimit
+OFFSET :offset

@@ -118,7 +118,7 @@
  :goldfound :gold_found, ; 10,
  :goldspent :gold_spent ; 0,
  :hp :hit_points ; 18,
- ; :id 1, ; internal field
+ :id :db_row_id, ; 1
  :kaux :killer_weapon_desc ; "",
  ; :killer "", ; fine as is
  ; :kills 0, ; ditto
@@ -179,6 +179,7 @@
 ;; Turn a row out of Postgres into Clojure data, mostly just turn
 ;; CITEXT -> string.
 
+
 (defn ensure-es-state [conn]
   (when-not (esi/exists? conn index-name)
    (esi/create conn index-name :mappings mappings)))
@@ -201,25 +202,39 @@
     (first (get-logrecord {:id id} {:connection db}))
     {})))
 
+(def batch-limit 100)
+
 (defn games-after-from-db [offset db]
-  (map row->game
-       (take 3 (games-since-offset {:offset offset} {:connection db}))))
+  (let [binds {:offset offset
+               :batchlimit batch-limit}
+        query-options {:connection db}]
+   (map row->game (games-since-offset binds query-options))))
 
 (defn add-game-to-es [game conn]
   (esd/put conn index-name mapping-type (:id game) game))
 
+(defn catch-up-on-games [offset es db]
+  (loop [game-batch (games-after-from-db offset db)
+         final-db-row-id offset]
+    (cond (empty? game-batch)
+          ;; This is where we will resume from next.
+          final-db-row-id
+          ;; But if games were found then process them.
+          :else
+          (let [last-row-id (:db_row_id (last game-batch))]
+            (doseq [game game-batch]
+              (add-game-to-es game es)) ;; TODO Bulk update!
+            (println (str "Added " (count game-batch) " games [" last-row-id "] ..."))
+            (recur (games-after-from-db last-row-id db) last-row-id)))))
+
 (defn really-follow-logrecords [component offset]
   (let [db (:spec (:db component))
         es (:conn (:es component))
-        me (:ls component)
-        games (games-after-from-db offset db)]
-    (doseq [game games]
-      (println "Adding " (:id game))
-      (add-game-to-es game es))
-    (println "Added " (count games) " games to ES")
-    (Thread/sleep 1000)
-    (when (deref (:should-keep-running me))
-     (recur component (:file_offset (last games))))))
+        me (:logsumer component)]
+    (let [last-row-id (catch-up-on-games offset es db)]
+      (Thread/sleep 1000) ;; Lazy polling FTW.
+      (when (deref (:should-keep-running me))
+        (recur component last-row-id)))))
 
 (defn follow-logrecords [component]
   (future (really-follow-logrecords component 0)) ;; XXX Don't always start from the start!

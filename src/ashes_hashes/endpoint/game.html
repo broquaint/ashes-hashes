@@ -17,7 +17,7 @@
     </header>
 
     <main class=row>
-      <nav id=facets class=col-md-4>
+      <nav id=facets class=col-md-2>
         <section class=facet>
           <h4>Field name</h4>
           <dl class=dl-horizontal>
@@ -28,10 +28,25 @@
       </nav>
 
       <section id=listing class=col-md-8>
-        <h2>Games that happened :-</h2>
-        <ul id=games>
-          <li class=game>Game</li>
-        </ul>
+        <h2>Games that happened</h2>
+        <table class='table table-striped'>
+          <thead>
+            <tr>
+              <td>Score</td>
+              <td>Player</td>
+              <td>Combo</td>
+              <td>Ended</td>
+            </tr>
+          </thead>
+          <tbody id=games>
+            <tr class=game>
+              <td class=game-score>1234</td>
+              <td class=game-player>foo</td>
+              <td class=game-combo>HuWa</td>
+              <td class=game-ending>escaped alive</td>
+            </tr>
+          </tbody>
+        </table>
       </section>
     </main>
   </body>

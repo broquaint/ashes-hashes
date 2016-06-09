@@ -37,7 +37,10 @@
 
 (html/defsnippet game-entry the-template  [:.game]
   [game]
-  [:li] (html/content (game-to-str game)))
+  [:.game-score]  (html/content (str (:score game)))
+  [:.game-player] (html/content (:player_name game))
+  [:.game-combo]  (html/content (str (:race game) " " (:class game)))
+  [:.game-ending] (html/content (:terse_msg game)))
 
 ; Structure of the aggregations
 (comment

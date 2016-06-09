@@ -70,7 +70,7 @@ LEFT JOIN l_mapdesc ON logrecord.mapdesc_id = l_mapdesc.id
 LEFT JOIN l_banisher ON logrecord.banisher_id = l_banisher.id
 LEFT JOIN l_maxskills ON logrecord.maxskills_id = l_maxskills.id
 LEFT JOIN l_status ON logrecord.status_id = l_status.id
--- Not optimal but it'll do.
+WHERE logrecord.id > :from_id
+  AND logrecord.id < :to_id
 ORDER BY logrecord.id
-LIMIT :batchlimit
-OFFSET :offset
+LIMIT :batch_limit

@@ -203,11 +203,12 @@
     (first (get-logrecord {:id id} {:connection db}))
     {})))
 
-(def batch-limit 100)
+(def batch-limit 200)
 
 (defn games-after-from-db [offset db]
-  (let [binds {:offset offset
-               :batchlimit batch-limit}
+  (let [binds {:from_id offset
+               :to_id (+ offset (+ 1 batch-limit))
+               :batch_limit batch-limit}
         query-options {:connection db}]
    (map row->game (games-since-offset binds query-options))))
 

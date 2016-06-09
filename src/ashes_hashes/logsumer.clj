@@ -203,7 +203,18 @@
     (first (get-logrecord {:id id} {:connection db}))
     {})))
 
-(def batch-limit 200)
+(def ^:private offset-type "logsumer")
+(def ^:private offset-id "27")
+
+(defn save-last-seen-row [conn last-row-id]
+  (es-doc/put conn index-name offset-type offset-id {:offset last-row-id}))
+
+(defn get-last-seen-row [conn]
+  (let [result (es-doc/get conn index-name offset-type offset-id)
+        document (:_source result)]
+    (get document :offset 0)))
+
+(def ^:private batch-limit 200)
 
 (defn games-after-from-db [offset db]
   (let [binds {:from_id offset
@@ -229,6 +240,7 @@
            :else
            (let [last-row-id (:db_row_id (last game-batch))]
              (add-games-to-es es game-batch)
+             (save-last-seen-row es last-row-id)
              (println (str "Added " (count game-batch) " games [" last-row-id "] ..."))
              (recur (games-after-from-db last-row-id db) last-row-id))))))
 
@@ -240,7 +252,7 @@
       (recur component last-row-id))))
 
 (defn follow-logrecords [component]
-  (future (really-follow-logrecords component 0)) ;; XXX Don't always start from the start!
+  (future (really-follow-logrecords component (get-last-seen-row (:conn (:es component)))))
   component)
 
 (defrecord Logsumer []

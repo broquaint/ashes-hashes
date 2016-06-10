@@ -15,82 +15,84 @@
 (def ^:private mappings
   {(keyword type-name)
    {:properties
-    {:affected_max_hit_points {:type "long"}
-     :base_magic_points {:type "long"}
-     :evasion {:type "long"}
-     :kills {:type "long"}
-     :most_recent_depth {:type "long"}
-     :real_max_hit_points {:type "long"}
-     :deepest_ziggurat_depth {:type "long"}
-     :vsav {:type "string" :index "not_analyzed"}
-     :banisher {:type "string" :index "not_analyzed"}
-     :gold_found {:type "long"}
-     :best_skill {:type "string" :index "not_analyzed"}
-     :place {:type "string" :index "not_analyzed"}
-     :full_version {:type "string" :index "not_analyzed"}
-     :experience_level {:type "long"}
-     :canonicalised_version {:type "string" :index "not_analyzed"}
-     :damage_from_all_sources {:type "long"}
-     :deepest_level {:type "long"}
-     :race {:type "string" :index "not_analyzed"}
-     :scrolls_used {:type "long"}
-     :file {:type "string" :index "not_analyzed"}
-     :intelligence {:type "long"}
-     :number_of_ziggurats_completed {:type "long"}
-     :start {:format "strict_date_optional_time||epoch_millis", :type "date"}
-     :maxed_out_skills {:type "string" :index "not_analyzed"}
-     :penance {:type "long"}
-     :god {:type "string" :index "not_analyzed"}
-     :armor_class {:type "long"}
-     :duration {:type "long"}
-     :src {:type "string" :index "not_analyzed"}
-     :piety {:type "long"}
-     :level_type {:type "string" :index "not_analyzed"}
-     :rstart {:type "string" :index "not_analyzed"}
-     :title {:type "string" :index "not_analyzed"}
-     :ntv {:type "long"}
-     :aut {:type "long"}
-     :max_magic_points {:type "long"}
-     :gold {:type "long"}
-     :turn {:type "long"}
-     :killer {:type "string" :index "not_analyzed"}
-     :strength {:type "long"}
-     :damage {:type "long"}
-     :best_skill_level {:type "long"}
-     :status {:type "string" :index "not_analyzed"}
-     :id {:type "string" :index "not_analyzed"}
-     :kind_of_undead {:type "string" :index "not_analyzed"}
-     :class {:type "string" :index "not_analyzed"}
-     :score {:type "long"}
-     :dexterity {:type "long"}
-     :player_name {:type "string" :index "not_analyzed"}
-     :rune_count {:type "long"}
+    {
+     :affected_max_hit_points {:type "long"}
      :alpha {:type "boolean"}
-     :unique_rune_count {:type "long"}
-     :wiz {:type "boolean"}
-     :tiles {:type "boolean"}
-     :canonicalised_race {:type "string" :index "not_analyzed"}
-     :experimental_branch_name {:type "string" :index "not_analyzed"}
-     :magic_points {:type "long"}
-     :end {:format "strict_date_optional_time||epoch_millis", :type "date"}
-     :version {:type "string" :index "not_analyzed"}
+     :armor_class {:type "long"}
+     :aut {:type "long"}
+     :banisher {:type "string" :index "not_analyzed"}
+     :base_magic_points {:type "long"}
+     :best_skill {:type "string" :index "not_analyzed"}
+     :best_skill_level {:type "long"}
      :branch {:type "string" :index "not_analyzed"}
-     :gold_spent {:type "long"}
-     :map_name {:type "string" :index "not_analyzed"}
-     :ending_type {:type "string" :index "not_analyzed"}
-     :rend {:type "string" :index "not_analyzed"}
-     :hit_points {:type "long"}
-     :lv {:type "string" :index "not_analyzed"}
-     :file_offset {:type "long"}
-     :terse_msg {:type "string" :index "not_analyzed"}
-     :death_blame_chain {:type "string" :index "not_analyzed"}
-     :damage_from_source {:type "long"}
-     :killer_weapon_desc {:type "string" :index "not_analyzed"}
+     :canonicalised_race {:type "string" :index "not_analyzed"}
+     :canonicalised_version {:type "string" :index "not_analyzed"}
      :charabbrev {:type "string" :index "not_analyzed"}
-     :vsavrv {:type "string" :index "not_analyzed"}
-     :potions_used {:type "long"}
+     :class {:type "string" :index "not_analyzed"}
+     :damage {:type "long"}
+     :damage_from_all_sources {:type "long"}
+     :damage_from_source {:type "long"}
+     :death_blame_chain {:type "string" :index "not_analyzed"}
+     :deepest_level {:type "long"}
+     :deepest_ziggurat_depth {:type "long"}
+     :dexterity {:type "long"}
+     :duration {:type "long"}
+     :end {:format "strict_date_optional_time||epoch_millis", :type "date"}
+     :ending_type {:type "string" :index "not_analyzed"}
+     :evasion {:type "long"}
+     :experience_level {:type "long"}
+     :experimental_branch_name {:type "string" :index "not_analyzed"}
+     :file {:type "string" :index "not_analyzed"}
+     :file_offset {:type "long"}
+     :full_version {:type "string" :index "not_analyzed"}
+     :god {:type "string" :index "not_analyzed"}
+     :gold {:type "long"}
+     :gold_found {:type "long"}
+     :gold_spent {:type "long"}
+     :hit_points {:type "long"}
+     :id {:type "string" :index "not_analyzed"}
+     :intelligence {:type "long"}
+     :killer {:type "string" :index "not_analyzed"}
+     :killer_weapon_desc {:type "string" :index "not_analyzed"}
+     :kills {:type "long"}
+     :kind_of_undead {:type "string" :index "not_analyzed"}
+     :level_type {:type "string" :index "not_analyzed"}
+     :lv {:type "string" :index "not_analyzed"}
+     :magic_points {:type "long"}
      :map_description {:type "string" :index "not_analyzed"}
-     :shields {:type "long"}}}})
+     :map_name {:type "string" :index "not_analyzed"}
+     :max_magic_points {:type "long"}
+     :maxed_out_skills {:type "string" :index "not_analyzed"}
+     :most_recent_depth {:type "long"}
+     :ntv {:type "long"}
+     :number_of_ziggurats_completed {:type "long"}
+     :penance {:type "long"}
+     :piety {:type "long"}
+     :place {:type "string" :index "not_analyzed"}
+     :player_name {:type "string" :index "not_analyzed"}
+     :potions_used {:type "long"}
+     :race {:type "string" :index "not_analyzed"}
+     :real_max_hit_points {:type "long"}
+     :rend {:type "string" :index "not_analyzed"}
+     :rstart {:type "string" :index "not_analyzed"}
+     :rune_count {:type "long"}
+     :score {:type "long"}
+     :scrolls_used {:type "long"}
+     :shields {:type "long"}
+     :src {:type "string" :index "not_analyzed"}
+     :start {:format "strict_date_optional_time||epoch_millis", :type "date"}
+     :status {:type "string" :index "not_analyzed"}
+     :strength {:type "long"}
+     :terse_msg {:type "string" :index "not_analyzed"}
+     :tiles {:type "boolean"}
+     :title {:type "string" :index "not_analyzed"}
+     :turn {:type "long"}
+     :unique_rune_count {:type "long"}
+     :version {:type "string" :index "not_analyzed"}
+     :vsav {:type "string" :index "not_analyzed"}
+     :vsavrv {:type "string" :index "not_analyzed"}
+     :wiz {:type "boolean"}
+     }}})
 
 ;; Take the logrecord fields and turn them into something I can make
 ;; sense of at a glance/
@@ -184,6 +186,11 @@
 (defn ensure-es-state [conn]
   (when-not (es-index/exists? conn index-name)
    (es-index/create conn index-name :mappings mappings)))
+
+;; Not ideal but it does the job for now.
+(defn valid-game-key [key]
+  (let [game-keys (:properties (get mappings (keyword type-name)))]
+    (contains? game-keys key)))
 
 (defn- pgrow->clj [row]
   (map-vals (fn [v]

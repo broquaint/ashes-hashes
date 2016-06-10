@@ -7,20 +7,30 @@
             [ashes-hashes.logsumer :as lg]))
 
 (def facets
-  {:race "Species"
+  (array-map
+   :canonicalised_race "Species"
    :class "Background"
    :god "God"
-   :terse_msg "Final Message"
-   :version "Game Version"})
+   :killer "Killer"
+   :canonicalised_version "Game Version"))
 
 (defn game-to-str [doc]
   (str (:player_name doc) " the " (:charabbrev doc) " got " (:score doc)))
 
 (def the-template "ashes_hashes/endpoint/game.html")
 
+; Structure of the aggregations
+(comment
+  {:race
+   {:doc_count_error_upper_bound 0
+    :sum_other_doc_count 0
+    :buckets
+    [{:key "elf", :doc_count 1}]}})
+
 (defn facet-value-default [facet refinement]
   (cond
     (and (= "god" facet) (empty? refinement)) "No God"
+    (and (= "killer" facet) (empty? refinement)) "not killed"
     :else (str refinement)))
 
 (html/defsnippet facet-refinement the-template [:dl :> #{:dt :dd}]
@@ -42,25 +52,18 @@
   [:.game-combo]  (html/content (str (:race game) " " (:class game)))
   [:.game-ending] (html/content (:terse_msg game)))
 
-; Structure of the aggregations
-(comment
-  {:race
-   {:doc_count_error_upper_bound 0
-    :sum_other_doc_count 0
-    :buckets
-    [{:key "elf", :doc_count 1}]}})
-
 (html/deftemplate games the-template
   [results]
   [:#games] (let [hits (esrsp/hits-from results)
                  games (map :_source hits)]
              (html/content (map game-entry games)))
-  [:.facet] (let [facets (esrsp/aggregations-from results)]
-            (html/content (map facet-item facets))))
+  [:.facet] (let [res (esrsp/aggregations-from results)
+                  facet-results (select-keys res (keys facets))]
+            (html/content (map facet-item facet-results))))
 
 (defn generate-query [params]
   (let [refinements (map #(q/terms % (get params %))
-                         (filter (partial contains? params) (keys facets)))]
+                         (filter lg/valid-game-key (keys params)))]
    (if (empty? refinements)
      (q/match-all)
      (first refinements))))

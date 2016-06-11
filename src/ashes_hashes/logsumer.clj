@@ -248,12 +248,14 @@
            (let [last-row-id (:db_row_id (last game-batch))]
              (add-games-to-es es game-batch)
              (save-last-seen-row es last-row-id)
-             (println (str "Added " (count game-batch) " games [" last-row-id "] ..."))
+;             (println (str "Added " (count game-batch) " games [" last-row-id "] ..."))
              (recur (games-after-from-db last-row-id db) last-row-id))))))
 
 (defn really-follow-logrecords [component offset]
   (let [should-keep-running (:should-keep-running (:logsumer component))
         last-row-id (catch-up-on-games component offset)]
+    (when-not (= offset last-row-id)
+      (println (format "All caught up - last saw %d, added %d games!" last-row-id (- last-row-id offset))))
     (Thread/sleep 1000) ;; Lazy polling FTW.
     (when @should-keep-running
       (recur component last-row-id))))

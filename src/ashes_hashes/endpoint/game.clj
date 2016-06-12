@@ -49,6 +49,7 @@
   [game]
   [:.game-score]  (html/content (str (:score game)))
   [:.game-player] (html/content (:player_name game))
+  [:.game-xl]     (html/content (str (:experience_level game)))
   [:.game-combo]  (html/content (str (:race game) " " (:class game)))
   [:.game-ending] (html/content (:terse_msg game)))
 
